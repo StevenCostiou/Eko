@@ -17,7 +17,9 @@ Class {
 		'selectedCommitLabel',
 		'selectCommitButton',
 		'mainProjectLabel',
-		'selectMainProjectDropList'
+		'selectMainProjectDropList',
+		'code',
+		'runDebuggerButton'
 	],
 	#category : #'Eko-Presenters'
 }
@@ -34,16 +36,23 @@ EkoConfigurationPresenter class >> defaultSpec [
 				   add: #selectedPackagesLabel;
 				   add: #selectPackagesButton withConstraints: [:c| c height: 24; width: 24];
 				   yourself) expand: false fill: false padding: 5;
-		add: (SpBoxLayout newLeftToRight
+		  add: (SpBoxLayout newLeftToRight
 				   add: #mainProjectLabel;
 				   add: #selectMainProjectDropList;
 				   yourself) expand: false fill: false padding: 5;
 		  add: (SpBoxLayout newLeftToRight
 				   add: #selectedCommitLabel;
 				   add: #selectCommitButton withConstraints: [:c| c height: 24; width: 24];
-				   yourself) expand: false fill: false padding: 5; 
-			yourself"
-		  add: #runDebuggerButton"
+				   yourself) expand: false fill: false padding: 5;
+			add: (SpBoxLayout newTopToBottom
+				   add: 'Code to debug:' expand: false fill: false padding: 5;
+					add: (SpPanedLayout newLeftToRight
+								positionOfSlider: 80 percent;
+								add: #code;
+								add: (SpBoxLayout newTopToBottom add: #runDebuggerButton withConstraints: [:c| c height: 24; width: 60]; yourself);
+								yourself);
+							yourself);
+			yourself
 ]
 
 { #category : #accessing }
@@ -73,7 +82,12 @@ EkoConfigurationPresenter >> initializePresenters [
 	selectCommitButton := self newButton.
 	selectCommitButton action:[self selectCommit].
 	selectCommitButton icon: (self iconNamed: #config).	
-
+		
+	code := self newCode.
+	runDebuggerButton := self newButton.
+	runDebuggerButton action:[self runDebugger].
+	runDebuggerButton icon: (self iconNamed: #glamorousBug).	
+	runDebuggerButton label: 'Debug'.
 	self update
 ]
 
