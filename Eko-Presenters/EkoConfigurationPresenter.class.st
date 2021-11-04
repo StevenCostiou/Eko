@@ -58,6 +58,7 @@ EkoConfigurationPresenter class >> defaultSpec [
 
 { #category : #actions }
 EkoConfigurationPresenter >> debug [
+	ekoConfiguration sourceCode: code text.
 	debugger := EkoDebugger on: ekoConfiguration.
 	debugger debug
 ]

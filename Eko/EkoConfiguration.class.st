@@ -5,7 +5,8 @@ Class {
 		'projects',
 		'commit',
 		'packagesNames',
-		'mainProject'
+		'mainProject',
+		'sourceCode'
 	],
 	#category : #Eko
 }
@@ -98,4 +99,14 @@ EkoConfiguration >> selectCommit: anIceTipCachedModel [
 { #category : #'api-configuration' }
 EkoConfiguration >> selectedCommit [
 	^commit
+]
+
+{ #category : #accessing }
+EkoConfiguration >> sourceCode [
+	^ sourceCode
+]
+
+{ #category : #accessing }
+EkoConfiguration >> sourceCode: aString [ 
+	sourceCode := aString
 ]
