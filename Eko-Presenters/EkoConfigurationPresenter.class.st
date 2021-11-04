@@ -99,6 +99,11 @@ EkoConfigurationPresenter >> selectProjects [
 	EkoProjectSelectionPresenter on: self ekoConfiguration parentPresenter: self
 ]
 
+{ #category : #initialization }
+EkoConfigurationPresenter >> title [
+	^'Eko configuration'
+]
+
 { #category : #updating }
 EkoConfigurationPresenter >> update [
 	self updateSelectedProjectsLabel.
@@ -150,4 +155,9 @@ EkoConfigurationPresenter >> updateSelectedProjectsLabel [
 	str space.
 	str << 'project(s) selected'.
 	selectedProjectLabel label: str contents
+]
+
+{ #category : #initialization }
+EkoConfigurationPresenter >> windowIcon [
+	^self iconNamed: #glamorousBug
 ]
