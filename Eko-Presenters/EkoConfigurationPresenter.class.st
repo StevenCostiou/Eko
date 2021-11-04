@@ -19,7 +19,8 @@ Class {
 		'mainProjectLabel',
 		'selectMainProjectDropList',
 		'code',
-		'runDebuggerButton'
+		'runDebuggerButton',
+		'debugger'
 	],
 	#category : #'Eko-Presenters'
 }
@@ -55,6 +56,12 @@ EkoConfigurationPresenter class >> defaultSpec [
 			yourself
 ]
 
+{ #category : #actions }
+EkoConfigurationPresenter >> debug [
+	debugger := EkoDebugger on: ekoConfiguration.
+	debugger debug
+]
+
 { #category : #accessing }
 EkoConfigurationPresenter >> ekoConfiguration [
 
@@ -77,6 +84,7 @@ EkoConfigurationPresenter >> initializePresenters [
 	mainProjectLabel label: 'Main project:'.
 	selectMainProjectDropList := self newDropList.
 	selectMainProjectDropList display: [ :iceRepo| iceRepo name ].
+	selectMainProjectDropList whenSelectedItemChangedDo: [ :item| self ekoConfiguration mainProject: item ]. 
 	
 	selectedCommitLabel := self newLabel.
 	selectCommitButton := self newButton.
@@ -85,7 +93,7 @@ EkoConfigurationPresenter >> initializePresenters [
 		
 	code := self newCode.
 	runDebuggerButton := self newButton.
-	runDebuggerButton action:[self runDebugger].
+	runDebuggerButton action:[self debug].
 	runDebuggerButton icon: (self iconNamed: #glamorousBug).	
 	runDebuggerButton label: 'Debug'.
 	self update

@@ -16,12 +16,12 @@ EkoMethodTraceHandler class >> on: anEkoTrace [
 		  yourself
 ]
 
-{ #category : #accessing }
+{ #category : #evaluating }
 EkoMethodTraceHandler >> beforeExecutionWithReceiver: anObject arguments: anArrayOfObjects [
 	trace traceProxy: proxy arguments: anArrayOfObjects
 ]
 
-{ #category : #accessing }
+{ #category : #evaluating }
 EkoMethodTraceHandler >> beforeMethod [
 "	trace traceProxy: proxy "
 ]

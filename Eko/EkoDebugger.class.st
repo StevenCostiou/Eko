@@ -6,22 +6,17 @@ Class {
 		'workingRun',
 		'instrumenter',
 		'commitLoader',
-		'runMethod',
-		'failingCommit',
-		'workingCommit',
-		'testClass',
-		'testSelector'
+		'configuration'
 	],
 	#category : #Eko
 }
 
 { #category : #'instance creation' }
-EkoDebugger class >> ekoDebugTest: testMethod betweenFailing: failingCommit andWorkingCommit: workingCommit [
+EkoDebugger class >> on: anEkoConfiguration [
 
-	^ self new
-		  testMethod: testMethod;
-		  failingCommit: failingCommit;
-		  workingCommit: workingCommit;
+	^ self basicNew
+		  configuration: anEkoConfiguration;
+		  initialize;
 		  yourself
 ]
 
@@ -45,10 +40,22 @@ EkoDebugger >> compareTraces [
 		openWithSpec
 ]
 
+{ #category : #accessing }
+EkoDebugger >> configuration [
+
+	^ configuration
+]
+
+{ #category : #accessing }
+EkoDebugger >> configuration: anObject [
+
+	configuration := anObject
+]
+
 { #category : #'debug - control' }
 EkoDebugger >> debug [
 
-	[ testClass new perform: testSelector ]
+	self sourceBlock
 		on: Error
 		do: [ :e | instrumenter traces add: e printString ].
 	instrumenter traces add: #end
@@ -57,33 +64,27 @@ EkoDebugger >> debug [
 { #category : #'debug - control' }
 EkoDebugger >> debugFailingRun [
 
-	failingRun := self loadAndDebugCommit: failingCommit
+	failingRun := self loadAndDebugCommit: self failingCommit
 ]
 
 { #category : #'debug - control' }
 EkoDebugger >> debugWorkingRun [
-	workingRun := self loadAndDebugCommit: workingCommit
+	workingRun := self loadAndDebugCommit: self workingCommit
 ]
 
-{ #category : #initialize }
+{ #category : #'private - accessing' }
+EkoDebugger >> failingCommit [
+	^configuration selectedCommit
+]
+
+{ #category : #initialization }
 EkoDebugger >> initialize [
 
-	| repo workingCopy packages |
-	repo := IceRepository repositories detect: [ :r | 
-		        r name = 'OCDEval-Tasks' ].
-	workingCopy := repo workingCopy.
-
-	failingCommit := workingCopy referenceCommit.
-	workingCommit := repo lookupCommit: failingCommit ancestorIds first.
 	
 	commitLoader := EkoCommitLoader new.
-	commitLoader workingCopy: workingCopy.
-
-	packages := { AtomMorph package }.
-	instrumenter := EkoPackageInstrumenter forPackages: packages.
+	commitLoader workingCopy: self workingCopy.
+	instrumenter := EkoPackageInstrumenter forPackages: configuration packages
 	
-	testClass := OCDTaskTest.
-	testSelector := #testAtomMorphSelection
 ]
 
 { #category : #accessing }
@@ -115,4 +116,30 @@ EkoDebugger >> printTrace: aCollectionOfStrings [
 		str nextPutAll: s.
 		str cr ].
 	^ str contents
+]
+
+{ #category : #'private - accessing' }
+EkoDebugger >> repository [
+	^configuration mainProject
+]
+
+{ #category : #'debug - control' }
+EkoDebugger >> sourceBlock [
+
+	| sourceStream |
+	sourceStream := WriteStream on: String new.
+	sourceStream << '['.
+	sourceStream << configuration sourceCode.
+	sourceStream << ']'.
+	^ self class compiler evaluate: sourceStream contents
+]
+
+{ #category : #'private - accessing' }
+EkoDebugger >> workingCommit [
+	^self repository lookupCommit: self failingCommit ancestorIds first
+]
+
+{ #category : #'private - accessing' }
+EkoDebugger >> workingCopy [
+	^self repository workingCopy
 ]

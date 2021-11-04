@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'projects',
 		'commit',
-		'packagesNames'
+		'packagesNames',
+		'mainProject'
 	],
 	#category : #Eko
 }
@@ -36,6 +37,17 @@ EkoConfiguration >> initialize [
 
 	projects := OrderedCollection new.
 	packagesNames := OrderedCollection new
+]
+
+{ #category : #accessing }
+EkoConfiguration >> mainProject [
+
+	^ mainProject
+]
+
+{ #category : #accessing }
+EkoConfiguration >> mainProject: anUndefinedObject [ 
+	mainProject := anUndefinedObject 
 ]
 
 { #category : #'api-configuration' }
@@ -78,7 +90,12 @@ EkoConfiguration >> removeProject: anIceRepository [
 	anIceRepository workingCopy packages do:[:iceP| self removePackageNamed: iceP name]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'api-configuration' }
 EkoConfiguration >> selectCommit: anIceTipCachedModel [ 
 	commit := anIceTipCachedModel realObject entity
+]
+
+{ #category : #'api-configuration' }
+EkoConfiguration >> selectedCommit [
+	^commit
 ]
