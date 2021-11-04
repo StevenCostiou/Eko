@@ -63,6 +63,12 @@ EkoConfiguration >> numberOfProjects [
 	^projects size
 ]
 
+{ #category : #accessing }
+EkoConfiguration >> packages [
+	self flag: 'just testing'.
+	^self projectsPackages collect:[:p| RPackageOrganizer default packageNamed: p name]
+]
+
 { #category : #printing }
 EkoConfiguration >> printSelectedCommitOn: aStream [
 	commit ifNil:[^self].

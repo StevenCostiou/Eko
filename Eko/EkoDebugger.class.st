@@ -54,7 +54,7 @@ EkoDebugger >> configuration: anObject [
 
 { #category : #'debug - control' }
 EkoDebugger >> debug [
-
+	0.5 seconds wait.
 	self sourceBlock
 		on: Error
 		do: [ :e | instrumenter traces add: e printString ].
@@ -70,6 +70,12 @@ EkoDebugger >> debugFailingRun [
 { #category : #'debug - control' }
 EkoDebugger >> debugWorkingRun [
 	workingRun := self loadAndDebugCommit: self workingCommit
+]
+
+{ #category : #'debug - control' }
+EkoDebugger >> ekoDebug [
+	self debugFailingRun.
+	self debugWorkingRun 
 ]
 
 { #category : #'private - accessing' }

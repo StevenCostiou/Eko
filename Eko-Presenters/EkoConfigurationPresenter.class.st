@@ -20,7 +20,9 @@ Class {
 		'selectMainProjectDropList',
 		'code',
 		'runDebuggerButton',
-		'debugger'
+		'debugger',
+		'showResultsButton',
+		'progressBar'
 	],
 	#category : #'Eko-Presenters'
 }
@@ -50,7 +52,10 @@ EkoConfigurationPresenter class >> defaultSpec [
 					add: (SpPanedLayout newLeftToRight
 								positionOfSlider: 80 percent;
 								add: #code;
-								add: (SpBoxLayout newTopToBottom add: #runDebuggerButton withConstraints: [:c| c height: 24; width: 60]; yourself);
+								add: (SpBoxLayout newTopToBottom 
+									add: #runDebuggerButton withConstraints: [:c| c height: 24; width: 60];
+									add: #showResultsButton withConstraints: [:c| c height: 24; width: 60]; 
+									yourself);
 								yourself);
 							yourself);
 			yourself
@@ -59,8 +64,10 @@ EkoConfigurationPresenter class >> defaultSpec [
 { #category : #actions }
 EkoConfigurationPresenter >> debug [
 	ekoConfiguration sourceCode: code text.
+	self layout: (self layout add: progressBar).
 	debugger := EkoDebugger on: ekoConfiguration.
-	debugger debug
+	[[debugger ekoDebug] ensure:[self layout: self class defaultSpec]] fork
+	
 ]
 
 { #category : #accessing }
@@ -97,6 +104,15 @@ EkoConfigurationPresenter >> initializePresenters [
 	runDebuggerButton action:[self debug].
 	runDebuggerButton icon: (self iconNamed: #glamorousBug).	
 	runDebuggerButton label: 'Debug'.
+	
+	showResultsButton := self newButton.
+	showResultsButton action:[debugger compareTraces].
+	showResultsButton icon: (self iconNamed: #glamorousSearch).	
+	showResultsButton label: 'Results'.
+	
+	progressBar := self newProgressBar.
+	progressBar indeterminate.
+	
 	self update
 ]
 
