@@ -55,6 +55,12 @@ EkoCommitConfigurationPresenter class >> defaultSpec [
 			yourself
 ]
 
+{ #category : #debugging }
+EkoCommitConfigurationPresenter >> debug [
+	ekoConfiguration sourceCode: code text.
+	super debug
+]
+
 { #category : #initialization }
 EkoCommitConfigurationPresenter >> initializePresenters [
 	selectedProjectLabel := self newLabel.
@@ -79,6 +85,11 @@ EkoCommitConfigurationPresenter >> initializePresenters [
 	selectCommitButton icon: (self iconNamed: #config).	
 		
 	super initializePresenters
+]
+
+{ #category : #accessing }
+EkoCommitConfigurationPresenter >> newEkoDebuggerOn: anEkoConfiguration [
+	^EkoDebugger onCommitEkoConfiguration: ekoConfiguration.
 ]
 
 { #category : #actions }

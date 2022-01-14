@@ -18,7 +18,9 @@ Class {
 		'selectCommitButton',
 		'selectMainProjectDropList',
 		'selectedTestMethodLabel',
-		'selectTestMethodButton'
+		'selectTestMethodButton',
+		'introduceTestFailureCode',
+		'fixTestFailureCode'
 	],
 	#category : #'Eko-Presenters'
 }
@@ -35,18 +37,38 @@ EkoStateConfigurationPresenter class >> defaultSpec [
 				   add: #selectedTestMethodLabel;
 				   add: #selectTestMethodButton withConstraints: [:c| c height: 24; width: 24];
 				   yourself) expand: false fill: false padding: 5;
-			add: (SpBoxLayout newTopToBottom
-				   add: 'Code to introduce test failure:' expand: false fill: false padding: 5;
+			add: (SpBoxLayout newTopToBottom				   
 					add: (SpPanedLayout newLeftToRight
 								positionOfSlider: 80 percent;
-								add: #code;
+								add:(SpBoxLayout newTopToBottom 
+									add: 'Script to introduce test failure:' expand: false fill: false padding: 5;
+									add: #introduceTestFailureCode;
+									add: 'Script to remove the test failure:' expand: false fill: false padding: 5;
+									add: #fixTestFailureCode;									yourself);
 								add: (SpBoxLayout newTopToBottom 
-									add: #runDebuggerButton withConstraints: [:c| c height: 24; width: 60];
+									add: #runDebuggerButton withConstraints: [:c| c height: 34; width: 60; padding: 5];
 									add: #showResultsButton withConstraints: [:c| c height: 24; width: 60]; 
 									yourself);
 								yourself);
 							yourself);
 			yourself
+]
+
+{ #category : #debugging }
+EkoStateConfigurationPresenter >> buildDebugScript [
+	^ '{1} new {2}' format: { 
+			  ekoConfiguration methodToDebug methodClass name.
+			  ekoConfiguration methodToDebug selector asString }
+]
+
+{ #category : #debugging }
+EkoStateConfigurationPresenter >> debug [
+
+	ekoConfiguration packages ifEmpty: [ ^ self ].
+	ekoConfiguration introduceBugScript: introduceTestFailureCode text.
+	ekoConfiguration fixBugScript: fixTestFailureCode text.
+	ekoConfiguration sourceCode: self buildDebugScript.
+	super debug
 ]
 
 { #category : #initialization }
@@ -62,7 +84,22 @@ EkoStateConfigurationPresenter >> initializePresenters [
 	selectTestMethodButton action:[self selectTestMethod].
 	selectTestMethodButton icon: (self iconNamed: #config).	
 		
+	introduceTestFailureCode := self newCode.
+	fixTestFailureCode := self newCode.
+		
 	super initializePresenters 
+]
+
+{ #category : #accessing }
+EkoStateConfigurationPresenter >> methodToDebug: aCompiledMethod [ 
+	self ekoConfiguration methodToDebug: aCompiledMethod.
+	self updateSelectedTestMethodLabel
+]
+
+{ #category : #accessing }
+EkoStateConfigurationPresenter >> newEkoDebuggerOn: anEkoConfiguration [
+
+	^ EkoDebugger onStatekoConfiguration: ekoConfiguration
 ]
 
 { #category : #actions }

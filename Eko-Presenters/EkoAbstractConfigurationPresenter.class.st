@@ -14,9 +14,9 @@ Class {
 
 { #category : #actions }
 EkoAbstractConfigurationPresenter >> debug [
-	ekoConfiguration sourceCode: code text.
+
 	self layout: (self layout add: progressBar).
-	debugger := EkoDebugger on: ekoConfiguration.
+	debugger := self newEkoDebuggerOn: ekoConfiguration.
 	[[debugger ekoDebug] ensure:[self layout: self class defaultSpec]] fork
 	
 ]
@@ -57,6 +57,12 @@ EkoAbstractConfigurationPresenter >> initializeShowResultsButtonPresenter [
 	showResultsButton action: [ debugger compareTraces ].
 	showResultsButton icon: (self iconNamed: #glamorousSearch).
 	showResultsButton label: 'Results'
+]
+
+{ #category : #accessing }
+EkoAbstractConfigurationPresenter >> newEkoDebuggerOn: anEkoConfiguration [
+
+	^ self subclassResponsibility
 ]
 
 { #category : #accessing }

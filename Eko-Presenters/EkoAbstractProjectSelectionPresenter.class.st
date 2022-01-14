@@ -66,7 +66,9 @@ EkoAbstractProjectSelectionPresenter >> initializePresenters [
 				 yourself);
 		addColumn: (SpStringTableColumn title: 'Name' evaluated: #name);
 		beResizable.
-	projectTable items: self items
+	projectTable items: (self items asSortedCollection: [:a :b| a name < b name]).
+	projectTable searchMatching: [ :item :pattern | 
+		projectTable performDefaultSearch: item name matching: pattern ].
 ]
 
 { #category : #private }
