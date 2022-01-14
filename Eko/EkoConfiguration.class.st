@@ -6,7 +6,8 @@ Class {
 		'commit',
 		'packagesNames',
 		'mainProject',
-		'sourceCode'
+		'sourceCode',
+		'testMethod'
 	],
 	#category : #Eko
 }
@@ -75,6 +76,13 @@ EkoConfiguration >> printSelectedCommitOn: aStream [
 	aStream << commit id
 ]
 
+{ #category : #printing }
+EkoConfiguration >> printSelectedTestMethodOn: aWriteStream [
+
+	testMethod ifNil: [ ^ self ].
+	testMethod printOn: aWriteStream
+]
+
 { #category : #accessing }
 EkoConfiguration >> projects [
 	^ projects
@@ -115,4 +123,16 @@ EkoConfiguration >> sourceCode [
 { #category : #accessing }
 EkoConfiguration >> sourceCode: aString [ 
 	sourceCode := aString
+]
+
+{ #category : #accessing }
+EkoConfiguration >> testMethod [
+
+	^ testMethod
+]
+
+{ #category : #accessing }
+EkoConfiguration >> testMethod: anObject [
+
+	testMethod := anObject
 ]
