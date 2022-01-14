@@ -1,15 +1,14 @@
 "
-I configure an eko debugging session.
+I configure an eko debugging session based on a commit that introduce a failure.
 You must select:
 - an iceberg project
 - a list of packages (by default, all of the iceberg project are there)
 - the commit in that project that introduces your problem
 "
 Class {
-	#name : #EkoConfigurationPresenter,
-	#superclass : #SpPresenter,
+	#name : #EkoCommitConfigurationPresenter,
+	#superclass : #EkoAbstractConfigurationPresenter,
 	#instVars : [
-		'ekoConfiguration',
 		'selectedProjectLabel',
 		'selectProjectButton',
 		'selectedPackagesLabel',
@@ -17,18 +16,13 @@ Class {
 		'selectedCommitLabel',
 		'selectCommitButton',
 		'mainProjectLabel',
-		'selectMainProjectDropList',
-		'code',
-		'runDebuggerButton',
-		'debugger',
-		'showResultsButton',
-		'progressBar'
+		'selectMainProjectDropList'
 	],
 	#category : #'Eko-Presenters'
 }
 
 { #category : #specs }
-EkoConfigurationPresenter class >> defaultSpec [
+EkoCommitConfigurationPresenter class >> defaultSpec [
 
 	^ SpBoxLayout newTopToBottom
 		  add: (SpBoxLayout newLeftToRight
@@ -61,23 +55,8 @@ EkoConfigurationPresenter class >> defaultSpec [
 			yourself
 ]
 
-{ #category : #actions }
-EkoConfigurationPresenter >> debug [
-	ekoConfiguration sourceCode: code text.
-	self layout: (self layout add: progressBar).
-	debugger := EkoDebugger on: ekoConfiguration.
-	[[debugger ekoDebug] ensure:[self layout: self class defaultSpec]] fork
-	
-]
-
-{ #category : #accessing }
-EkoConfigurationPresenter >> ekoConfiguration [
-
-	^ ekoConfiguration ifNil: [ ekoConfiguration := EkoConfiguration new ]
-]
-
 { #category : #initialization }
-EkoConfigurationPresenter >> initializePresenters [
+EkoCommitConfigurationPresenter >> initializePresenters [
 	selectedProjectLabel := self newLabel.
 	selectProjectButton := self newButton.
 	selectProjectButton action:[self selectProjects].
@@ -99,25 +78,11 @@ EkoConfigurationPresenter >> initializePresenters [
 	selectCommitButton action:[self selectCommit].
 	selectCommitButton icon: (self iconNamed: #config).	
 		
-	code := self newCode.
-	runDebuggerButton := self newButton.
-	runDebuggerButton action:[self debug].
-	runDebuggerButton icon: (self iconNamed: #glamorousBug).	
-	runDebuggerButton label: 'Debug'.
-	
-	showResultsButton := self newButton.
-	showResultsButton action:[debugger compareTraces].
-	showResultsButton icon: (self iconNamed: #glamorousSearch).	
-	showResultsButton label: 'Results'.
-	
-	progressBar := self newProgressBar.
-	progressBar indeterminate.
-	
-	self update
+	super initializePresenters
 ]
 
 { #category : #actions }
-EkoConfigurationPresenter >> selectCommit [
+EkoCommitConfigurationPresenter >> selectCommit [
 
 	(EkoTipRepositoryPresenter
 		 newOn:
@@ -127,24 +92,19 @@ EkoConfigurationPresenter >> selectCommit [
 ]
 
 { #category : #actions }
-EkoConfigurationPresenter >> selectPackages [
+EkoCommitConfigurationPresenter >> selectPackages [
 
 	EkoPackageSelectionPresenter on: self ekoConfiguration parentPresenter: self
 ]
 
 { #category : #actions }
-EkoConfigurationPresenter >> selectProjects [
+EkoCommitConfigurationPresenter >> selectProjects [
 
 	EkoProjectSelectionPresenter on: self ekoConfiguration parentPresenter: self
 ]
 
-{ #category : #initialization }
-EkoConfigurationPresenter >> title [
-	^'Eko configuration'
-]
-
 { #category : #updating }
-EkoConfigurationPresenter >> update [
+EkoCommitConfigurationPresenter >> update [
 	self updateSelectedProjectsLabel.
 	self updateSelectedPackagesLabel.
 	self updateSelectedCommitLabel.
@@ -153,7 +113,7 @@ EkoConfigurationPresenter >> update [
 ]
 
 { #category : #updating }
-EkoConfigurationPresenter >> updateMainProjectSelectionDropList [
+EkoCommitConfigurationPresenter >> updateMainProjectSelectionDropList [
 
 	| selectedItem |
 	selectedItem := selectMainProjectDropList selectedItem.
@@ -164,7 +124,7 @@ EkoConfigurationPresenter >> updateMainProjectSelectionDropList [
 ]
 
 { #category : #updating }
-EkoConfigurationPresenter >> updateSelectedCommitLabel [
+EkoCommitConfigurationPresenter >> updateSelectedCommitLabel [
 
 	| str |
 	str := WriteStream on: String new.
@@ -175,7 +135,7 @@ EkoConfigurationPresenter >> updateSelectedCommitLabel [
 ]
 
 { #category : #updating }
-EkoConfigurationPresenter >> updateSelectedPackagesLabel [
+EkoCommitConfigurationPresenter >> updateSelectedPackagesLabel [
 
 	| str |
 	str := WriteStream on: String new.
@@ -186,7 +146,7 @@ EkoConfigurationPresenter >> updateSelectedPackagesLabel [
 ]
 
 { #category : #updating }
-EkoConfigurationPresenter >> updateSelectedProjectsLabel [
+EkoCommitConfigurationPresenter >> updateSelectedProjectsLabel [
 
 	| str |
 	str := WriteStream on: String new.
@@ -194,9 +154,4 @@ EkoConfigurationPresenter >> updateSelectedProjectsLabel [
 	str space.
 	str << 'project(s) selected'.
 	selectedProjectLabel label: str contents
-]
-
-{ #category : #initialization }
-EkoConfigurationPresenter >> windowIcon [
-	^self iconNamed: #glamorousBug
 ]
