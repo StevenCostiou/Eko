@@ -7,7 +7,9 @@ Class {
 		'packagesNames',
 		'mainProject',
 		'sourceCode',
-		'testMethod'
+		'introduceBugScript',
+		'fixBugScript',
+		'methodToDebug'
 	],
 	#category : #Eko
 }
@@ -34,11 +36,35 @@ EkoConfiguration >> containsProject: aProject [
 	^projects includes: aProject
 ]
 
+{ #category : #accessing }
+EkoConfiguration >> fixBugScript [
+
+	^ fixBugScript
+]
+
+{ #category : #accessing }
+EkoConfiguration >> fixBugScript: anObject [
+
+	fixBugScript := anObject
+]
+
 { #category : #initialization }
 EkoConfiguration >> initialize [
 
 	projects := OrderedCollection new.
 	packagesNames := OrderedCollection new
+]
+
+{ #category : #accessing }
+EkoConfiguration >> introduceBugScript [
+
+	^ introduceBugScript
+]
+
+{ #category : #accessing }
+EkoConfiguration >> introduceBugScript: anObject [
+
+	introduceBugScript := anObject
 ]
 
 { #category : #accessing }
@@ -50,6 +76,18 @@ EkoConfiguration >> mainProject [
 { #category : #accessing }
 EkoConfiguration >> mainProject: anUndefinedObject [ 
 	mainProject := anUndefinedObject 
+]
+
+{ #category : #accessing }
+EkoConfiguration >> methodToDebug [
+
+	^ methodToDebug
+]
+
+{ #category : #accessing }
+EkoConfiguration >> methodToDebug: anObject [
+
+	methodToDebug := anObject
 ]
 
 { #category : #'api-configuration' }
@@ -66,8 +104,14 @@ EkoConfiguration >> numberOfProjects [
 
 { #category : #accessing }
 EkoConfiguration >> packages [
-	self flag: 'just testing'.
-	^self projectsPackages collect:[:p| RPackageOrganizer default packageNamed: p name]
+
+	self flag:
+		'Just testing. Looks wrong. Why are why not working with packages in the first place?'.
+	projects ifEmpty: [ 
+		^ packagesNames collect: [ :p | 
+			  RPackageOrganizer default packageNamed: p ] ].
+	^ self projectsPackages collect: [ :p | 
+		  RPackageOrganizer default packageNamed: p name ]
 ]
 
 { #category : #printing }
@@ -79,8 +123,8 @@ EkoConfiguration >> printSelectedCommitOn: aStream [
 { #category : #printing }
 EkoConfiguration >> printSelectedTestMethodOn: aWriteStream [
 
-	testMethod ifNil: [ ^ self ].
-	testMethod printOn: aWriteStream
+	methodToDebug ifNil: [ ^ self ].
+	methodToDebug printOn: aWriteStream
 ]
 
 { #category : #accessing }
@@ -90,7 +134,7 @@ EkoConfiguration >> projects [
 
 { #category : #'api-configuration' }
 EkoConfiguration >> projectsPackages [
-
+	projects ifEmpty: [^RPackage organizer packages].
 	^ (projects collect: [ :p | p workingCopy packages ]) flattened
 ]
 
@@ -123,16 +167,4 @@ EkoConfiguration >> sourceCode [
 { #category : #accessing }
 EkoConfiguration >> sourceCode: aString [ 
 	sourceCode := aString
-]
-
-{ #category : #accessing }
-EkoConfiguration >> testMethod [
-
-	^ testMethod
-]
-
-{ #category : #accessing }
-EkoConfiguration >> testMethod: anObject [
-
-	testMethod := anObject
 ]

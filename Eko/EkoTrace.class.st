@@ -32,7 +32,7 @@ EkoTrace >> traceProxy: proxy arguments: args [
 		str space.
 		str nextPutAll: '(' ].
 	args do: [ :arg | 
-		str nextPutAll: arg printString.
+		str nextPutAll: ([arg printString] on: Error do:[:err|'ERRROR']).
 		arg == args last ifFalse: [ 
 			str nextPutAll: ','.
 			str space ] ].

@@ -5,7 +5,6 @@ Class {
 		'failingRun',
 		'workingRun',
 		'instrumenter',
-		'commitLoader',
 		'configuration'
 	],
 	#category : #Eko
@@ -20,10 +19,14 @@ EkoDebugger class >> on: anEkoConfiguration [
 		  yourself
 ]
 
-{ #category : #accessing }
-EkoDebugger >> commitLoader: anObject [
+{ #category : #'instance creation' }
+EkoDebugger class >> onCommitEkoConfiguration: anEkoConfiguration [
+	^EkoCommitDebugger on: anEkoConfiguration 
+]
 
-	commitLoader := anObject
+{ #category : #'instance creation' }
+EkoDebugger class >> onStatekoConfiguration: anEkoConfiguration [
+	^EkoStateDebugger on: anEkoConfiguration 
 ]
 
 { #category : #'debug - control' }
@@ -32,6 +35,7 @@ EkoDebugger >> compareTraces [
 	| failingText workingText |
 	failingText := self printTrace: failingRun.
 	workingText := self printTrace: workingRun.
+	
 
 	SpDiffPresenter new
 		showOptions: false;
@@ -54,22 +58,30 @@ EkoDebugger >> configuration: anObject [
 
 { #category : #'debug - control' }
 EkoDebugger >> debug [
+
 	0.5 seconds wait.
 	self sourceBlock
-		on: Error
-		do: [ :e | instrumenter traces add: e printString ].
+		on: Error , TestFailure
+		do: [ :e | 
+			(e isKindOf: TestFailure)
+				ifTrue: [ instrumenter traces add: e printString ]
+				ifFalse: [ 
+					[ e resume ]
+						on: Error
+						do: [ instrumenter traces add: e printString ] ] ].
 	instrumenter traces add: #end
 ]
 
 { #category : #'debug - control' }
 EkoDebugger >> debugFailingRun [
 
-	failingRun := self loadAndDebugCommit: self failingCommit
+	self subclassResponsibility 
 ]
 
 { #category : #'debug - control' }
 EkoDebugger >> debugWorkingRun [
-	workingRun := self loadAndDebugCommit: self workingCommit
+
+	self subclassResponsibility 
 ]
 
 { #category : #'debug - control' }
@@ -78,17 +90,10 @@ EkoDebugger >> ekoDebug [
 	self debugWorkingRun 
 ]
 
-{ #category : #'private - accessing' }
-EkoDebugger >> failingCommit [
-	^configuration selectedCommit
-]
-
 { #category : #initialization }
 EkoDebugger >> initialize [
 
-	
-	commitLoader := EkoCommitLoader new.
-	commitLoader workingCopy: self workingCopy.
+
 	instrumenter := EkoPackageInstrumenter forPackages: configuration packages
 	
 ]
@@ -97,20 +102,6 @@ EkoDebugger >> initialize [
 EkoDebugger >> instrumenter: anObject [
 
 	instrumenter := anObject
-]
-
-{ #category : #'debug - control' }
-EkoDebugger >> loadAndDebugCommit: aCommit [
-	|results|
-	instrumenter reset.
-	commitLoader commit: aCommit.
-	commitLoader loadCommit.
-	instrumenter instrumentPackageList.
-	self debug.
-	results := instrumenter traces.
-	instrumenter reset.
-	^results
-	
 ]
 
 { #category : #'debug - control' }
@@ -130,19 +121,19 @@ EkoDebugger >> repository [
 ]
 
 { #category : #'debug - control' }
-EkoDebugger >> sourceBlock [
+EkoDebugger >> sourceBlock [	
+	^ self sourceBlock: configuration sourceCode
+]
+
+{ #category : #'debug - control' }
+EkoDebugger >> sourceBlock: aString [
 
 	| sourceStream |
 	sourceStream := WriteStream on: String new.
 	sourceStream << '['.
-	sourceStream << configuration sourceCode.
+	sourceStream << aString.
 	sourceStream << ']'.
 	^ self class compiler evaluate: sourceStream contents
-]
-
-{ #category : #'private - accessing' }
-EkoDebugger >> workingCommit [
-	^self repository lookupCommit: self failingCommit ancestorIds first
 ]
 
 { #category : #'private - accessing' }
